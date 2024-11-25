@@ -21,10 +21,10 @@ public class LoanInstallment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private BigDecimal amount; // Taksit tutarı
-    private BigDecimal paidAmount = BigDecimal.ZERO; // Ödenen tutar
-    private Date dueDate; // Vade tarihi
-    private Date paymentDate; // Ödeme tarihi
+    private BigDecimal amount; // Installment amount
+    private BigDecimal paidAmount = BigDecimal.ZERO; // Amount paid
+    private Date dueDate; // Due date
+    private Date paymentDate; // Payment date
     private boolean isPaid = false;
 
     @ManyToOne

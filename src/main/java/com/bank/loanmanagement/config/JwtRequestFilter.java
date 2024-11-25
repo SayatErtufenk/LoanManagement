@@ -40,9 +40,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        // JWT "Bearer token" formatında olmalı
+        // JWT must be in "Bearer token" format
         if ( authorizationHeader != null && authorizationHeader.startsWith( "Bearer " ) ) {
-            jwt = authorizationHeader.substring( 7 ); // "Bearer " kelimesini atla
+            jwt = authorizationHeader.substring( 7 ); // Skip the word "Bearer"
             username = jwtUtil.extractUsername( jwt );
         }
 

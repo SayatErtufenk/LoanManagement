@@ -39,7 +39,7 @@ public class MyUserDetailsService implements UserDetailsService {
             authorities.add( new SimpleGrantedAuthority( "ROLE_CUSTOMER" ) );
         }
 
-        // Müşterinin rolünü belirleyin. Eğer birden fazla rol varsa, buraya ekleyin.
+        // Set the role of the customer. If there is more than one role, add it here.
         return new User( customer.getUsername(), customer.getPassword(), authorities );
     }
 }

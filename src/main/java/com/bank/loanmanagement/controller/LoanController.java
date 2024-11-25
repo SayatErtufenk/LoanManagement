@@ -35,19 +35,19 @@ public class LoanController {
         return loanService.createLoan( request );
     }
 
-    // Tüm kredileri listeleme - Sadece ADMIN rolüne izin ver
+    // List all credits - Allow only ADMIN role
     @GetMapping( "/all" )
     @PreAuthorize( "hasRole('ADMIN')" )
     public List<LoanResponseDto> getAllLoans() {
         return loanService.getAllLoans();
     }
 
-    // Müşterinin kendi kredilerini listeleme - CUSTOMER rolüne izin ver
+    // List customer's own credits - Allow CUSTOMER role
     @GetMapping( "/my-loans" )
     @PreAuthorize( "hasRole('CUSTOMER')" )
     public List<LoanResponseDto> getMyLoans( Authentication authentication ) {
         String username = authentication.getName();
-        Customer customer = customerRepository.findByUsername( username ).orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
+        Customer customer = customerRepository.findByUsername( username ).orElseThrow( () -> new ResourceNotFoundException( "Customer not found" ) );
         return loanService.listLoans( customer.getId() );
     }
 

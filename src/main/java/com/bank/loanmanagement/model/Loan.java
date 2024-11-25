@@ -23,8 +23,8 @@ public class Loan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private BigDecimal loanAmount; // Ana para
-    private BigDecimal totalAmount; // Faizli toplam tutar
+    private BigDecimal loanAmount; // Principal amount
+    private BigDecimal totalAmount; // Total amount with interest
     private int numberOfInstallment;
     private Date createDate;
     private boolean isPaid = false;

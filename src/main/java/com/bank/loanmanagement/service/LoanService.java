@@ -49,7 +49,7 @@ public class LoanService {
     public List<LoanResponseDto> getAllLoans() {
         List<Loan> loans = loanRepository.findAll();
 
-        // Kredileri DTO'ya dönüştür
+        // Convert loans to DTO
         List<LoanResponseDto> loanDtos = loans.stream()
                 .map( loan -> new LoanResponseDto(
                         loan.getId(),
@@ -62,24 +62,24 @@ public class LoanService {
     }
 
     public LoanResponseDto createLoan( LoanRequestDto request ) {
-        // Müşteriyi doğrula
+        // Verify customer
         Customer customer = customerRepository.findById( request.getCustomerId() )
                 .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
 
-        // Taksit sayısı ve faiz oranı kontrolleri
+        // Number of installments and interest rate controls
         validateLoanRequest( request );
 
-        // Toplam kredi tutarını hesapla
+        // Calculate total loan amount
         BigDecimal totalLoanAmount = request.getAmount()
                 .multiply( BigDecimal.ONE.add( request.getInterestRate() ) );
 
-        // Müşterinin kredi limitiyle karşılaştır
+        // Compare with customer's credit limit
         BigDecimal newUsedCreditLimit = customer.getUsedCreditLimit().add( totalLoanAmount );
         if ( newUsedCreditLimit.compareTo( customer.getCreditLimit() ) > 0 ) {
             throw new InsufficientCreditLimitException( "Yetersiz kredi limiti" );
         }
 
-        // Kredi ve taksitlerin oluşturulması
+        // Creation of loans and installments
         Loan loan = new Loan();
         loan.setCustomer( customer );
         loan.setLoanAmount( request.getAmount() );
@@ -90,19 +90,19 @@ public class LoanService {
 
         loan = loanRepository.save( loan );
 
-        // Taksit tutarını hesapla
+        // Calculate the installment amount
         BigDecimal installmentAmount = totalLoanAmount.divide(
                 BigDecimal.valueOf( request.getNumberOfInstallment() ), 2, BigDecimal.ROUND_HALF_UP );
 
-        // Taksitleri oluştur
+        // Create installments
         List<LoanInstallment> installments = createInstallments( loan, installmentAmount, request.getNumberOfInstallment() );
         installmentRepository.saveAll( installments );
 
-        // Müşterinin kullanılan kredi limitini güncelle
+        // Update the customer's used credit limit
         customer.setUsedCreditLimit( newUsedCreditLimit );
         customerRepository.save( customer );
 
-        // Yanıtın hazırlanması
+        // Preparing the response
         return new LoanResponseDto(
                 loan.getId(),
                 totalLoanAmount,
@@ -142,14 +142,14 @@ public class LoanService {
     }
 
     public List<LoanResponseDto> listLoans( Long customerId ) {
-        // Müşterinin varlığını kontrol et
+        // Verify customer
         Customer customer = customerRepository.findById( customerId )
                 .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
 
-        // Müşteriye ait kredileri al
+        // Get customer loans
         List<Loan> loans = loanRepository.findByCustomerId( customerId );
 
-        // Kredileri DTO'ya dönüştür
+        // Convert loans to DTO
         List<LoanResponseDto> loanDtos = loans.stream()
                 .map( loan -> new LoanResponseDto(
                         loan.getId(),
@@ -164,14 +164,14 @@ public class LoanService {
     }
 
     public List<InstallmentDto> listInstallments( Long loanId ) {
-        // Kredinin varlığını kontrol et
+        // Check if the loan exists
         Loan loan = loanRepository.findById( loanId )
                 .orElseThrow( () -> new ResourceNotFoundException( "Kredi bulunamadı" ) );
 
-        // Krediye ait taksitleri al
+        // Get installments for the loan
         List<LoanInstallment> installments = installmentRepository.findByLoanId( loanId );
 
-        // Taksitleri DTO'ya dönüştür
+        // Convert installments to DTO
         List<InstallmentDto> installmentDtos = installments.stream()
                 .map( installment -> new InstallmentDto(
                         installment.getId(),
@@ -187,7 +187,7 @@ public class LoanService {
     }
 
     public PaymentResponseDto payLoan( Long loanId, BigDecimal amount ) {
-        // PaymentService aracılığıyla ödeme işlemini gerçekleştir
+        // Process payment via PaymentService
         return paymentService.payLoan( loanId, amount );
     }
 }

@@ -33,7 +33,7 @@ public class CustomerController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Tüm müşterileri listeleme (sadece ADMIN rolüne izin ver)
+    // List all clients (allow only ADMIN role)
     @GetMapping
     @PreAuthorize( "hasRole('ADMIN')" )
     public List<CustomerDto> getAllCustomers() {
@@ -41,19 +41,19 @@ public class CustomerController {
         return customers.stream().map( this::convertToDto ).collect( Collectors.toList() );
     }
 
-    // Müşteri oluşturma (sadece ADMIN rolüne izin ver)
+    // Create a client (allow only ADMIN role)
     @PostMapping
     @PreAuthorize( "hasRole('ADMIN')" )
     public Customer createCustomer( @RequestBody Customer customer ) {
 
         Optional<Customer> existingCustomer = customerRepository.findByUsername( customer.getUsername() );
         if ( existingCustomer.isPresent() ) {
-            throw new DuplicateUsernameException( "Aynı kullanıcı adına ait bir kayıt daha var." );
+            throw new DuplicateUsernameException( "There is another record for the same username." );
         }
 
         String plainPassword = customer.getPassword();
         if ( plainPassword == null || plainPassword.isEmpty() ) {
-            throw new IllegalArgumentException( "Şifre boş olamaz" );
+            throw new IllegalArgumentException( "Password cannot be empty" );
         }
         String hashedPassword = passwordEncoder.encode( plainPassword );
         customer.setPassword( hashedPassword );
@@ -65,20 +65,20 @@ public class CustomerController {
         return customerRepository.save( customer );
     }
 
-    // Belirli bir müşteriyi görüntüleme (sadece ADMIN rolüne izin ver)
+    // View a specific customer (allow only ADMIN role)
     @GetMapping( "/{id}" )
     @PreAuthorize( "hasRole('ADMIN')" )
     public Customer getCustomerById( @PathVariable Long id ) {
         return customerRepository.findById( id )
-                .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "No customer found" ) );
     }
 
-    // Müşteri güncelleme (sadece ADMIN rolüne izin ver)
+    // Update client (allow only ADMIN role)
     @PutMapping( "/{id}" )
     @PreAuthorize( "hasRole('ADMIN')" )
     public Customer updateCustomer( @PathVariable Long id, @RequestBody Customer customerDetails ) {
         Customer customer = customerRepository.findById( id )
-                .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "Customer not found" ) );
 
         customer.setName( customerDetails.getName() );
         customer.setSurname( customerDetails.getSurname() );
@@ -89,15 +89,15 @@ public class CustomerController {
         return customerRepository.save( customer );
     }
 
-    // Müşteri silme (sadece ADMIN rolüne izin ver)
+    // Delete client (allow only ADMIN role)
     @DeleteMapping( "/{id}" )
     @PreAuthorize( "hasRole('ADMIN')" )
     public String deleteCustomer( @PathVariable Long id ) {
         Customer customer = customerRepository.findById( id )
-                .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "Customer not found" ) );
 
         customerRepository.delete( customer );
-        return "Müşteri silindi: " + id;
+        return "Customer deleted: " + id;
     }
 
 
@@ -110,7 +110,7 @@ public class CustomerController {
         customerDto.setCreditLimit( customer.getCreditLimit() );
         customerDto.setUsedCreditLimit( customer.getUsedCreditLimit() );
 
-        // Loans'ları dönüştürme
+        // Converting loans
         List<LoanDto> loanDtos = customer.getLoans().stream().map( this::convertLoanToDto ).collect( Collectors.toList() );
         customerDto.setLoans( loanDtos );
         return customerDto;

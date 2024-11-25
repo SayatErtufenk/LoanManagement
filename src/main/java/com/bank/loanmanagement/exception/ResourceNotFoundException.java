@@ -11,7 +11,6 @@ public class ResourceNotFoundException extends RuntimeException {
         super(message);
     }
 
-    // Eğer isterseniz, 'cause' parametresini de ekleyebilirsiniz
     public ResourceNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }

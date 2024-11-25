@@ -1,5 +1,9 @@
 package com.bank.loanmanagement.helpers;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
 /**
@@ -7,26 +11,11 @@ import java.math.BigDecimal;
  * @since 24/11/2024
  */
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AdjustmentResult {
     private BigDecimal adjustedAmount;
     private BigDecimal discount;
     private BigDecimal penalty;
-
-    public AdjustmentResult(BigDecimal adjustedAmount, BigDecimal discount, BigDecimal penalty) {
-        this.adjustedAmount = adjustedAmount;
-        this.discount = discount;
-        this.penalty = penalty;
-    }
-
-    public BigDecimal getAdjustedAmount() {
-        return adjustedAmount;
-    }
-
-    public BigDecimal getDiscount() {
-        return discount;
-    }
-
-    public BigDecimal getPenalty() {
-        return penalty;
-    }
 }

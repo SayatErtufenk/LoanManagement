@@ -37,7 +37,7 @@ public class AuthenticationController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken( request.getUsername(), request.getPassword() ) );
         } catch (BadCredentialsException e) {
-            throw new Exception( "Geçersiz kullanıcı adı veya şifre", e );
+            throw new Exception( "Invalid username or password", e );
         }
         
         final UserDetails userDetails = userDetailsService.loadUserByUsername( request.getUsername() );

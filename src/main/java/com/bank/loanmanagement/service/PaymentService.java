@@ -52,10 +52,10 @@ public class PaymentService {
             LocalDate dueDate = Instant.ofEpochMilli( installment.getDueDate().getTime() )
                     .atZone( ZoneId.systemDefault() ).toLocalDate();
 
-            // Vade tarihi 3 aydan fazla gelecekte olan taksitler ödenemez
+            // Installments with a due date more than 3 months in the future cannot be paid.
             if ( dueDate.isAfter( maxPayableDate ) ) break;
 
-            // Ödül ve Ceza Hesaplaması
+            // Reward and Punishment Calculation
             AdjustmentResult adjustmentResult = calculateAdjustedAmount( installment, currentDate );
 
             BigDecimal adjustedAmount = adjustmentResult.getAdjustedAmount();
@@ -63,7 +63,7 @@ public class PaymentService {
             BigDecimal penalty = adjustmentResult.getPenalty();
 
             if ( amount.compareTo( adjustedAmount ) >= 0 ) {
-                // Ödeme işlemi
+                // Payment process
                 installment.setPaid( true );
                 installment.setPaymentDate( Date.from( currentDate.atStartOfDay( ZoneId.systemDefault() ).toInstant() ) );
                 installment.setPaidAmount( adjustedAmount );
@@ -73,7 +73,7 @@ public class PaymentService {
                 totalPaid = totalPaid.add( adjustedAmount );
                 installmentsPaid++;
 
-                // Toplam indirim ve ceza miktarlarını güncelle
+                // Update total discount and penalty amounts
                 totalDiscount = totalDiscount.add( discount );
                 totalPenalty = totalPenalty.add( penalty );
             } else {
@@ -81,7 +81,7 @@ public class PaymentService {
             }
         }
 
-        // Kredinin tamamen ödenip ödenmediğini kontrol et
+        // Check if the loan is fully paid
         boolean isLoanFullyPaid = installments.stream().allMatch( LoanInstallment::isPaid );
         loan.setPaid( isLoanFullyPaid );
         loanRepository.save( loan );
@@ -101,14 +101,14 @@ public class PaymentService {
         long daysDifference = ChronoUnit.DAYS.between( paymentDate, dueDate );
 
         if ( daysDifference > 0 ) {
-            // Erken ödeme indirimi
+            // Early payment discount
             discount = originalAmount
                     .multiply( BigDecimal.valueOf( 0.001 ) )
                     .multiply( BigDecimal.valueOf( daysDifference ) );
 
             adjustedAmount = originalAmount.subtract( discount );
         } else if ( daysDifference < 0 ) {
-            // Gecikme cezası
+            // Delay penalty
             long lateDays = -daysDifference;
             penalty = originalAmount
                     .multiply( BigDecimal.valueOf( 0.001 ) )
