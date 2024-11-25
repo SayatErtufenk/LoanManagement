@@ -27,7 +27,7 @@
 
 ## Overview
 
-This project is a **Loan API** developed for a bank, enabling their employees to create, list, and pay loans for customers. It provides RESTful endpoints secured with JWT-based authentication and role-based authorization.
+This project is a **Loan Management** developed for a bank, enabling their employees to create, list, and pay loans for customers. It provides RESTful endpoints secured with JWT-based authentication and role-based authorization.
 
 ## Features
 
@@ -101,7 +101,7 @@ mvn spring-boot:run
 Or by running the generated JAR file:
 
 ```bash
-java -jar target/loan-api-1.0.0.jar
+java -jar target/LoanManagement-1.0.0.jar
 ```
 
 The application will start on http://localhost:8080.

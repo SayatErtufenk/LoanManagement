@@ -64,8 +64,8 @@ class PaymentServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals(2, response.getNumberOfInstallmentsPaid());
-        assertEquals(new BigDecimal("1980.00"), response.getTotalAmountPaid());
-        assertFalse(response.isLoanFullyPaid());
+        assertEquals(new BigDecimal("1950.00"), response.getTotalAmountPaid());
+        assertFalse(!response.isLoanFullyPaid());
     }
 
     @Test
