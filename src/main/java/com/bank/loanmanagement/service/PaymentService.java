@@ -35,7 +35,7 @@ public class PaymentService {
 
     public PaymentResponseDto payLoan( Long loanId, BigDecimal amount ) {
         Loan loan = loanRepository.findById( loanId )
-                .orElseThrow( () -> new ResourceNotFoundException( "Kredi bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "Loan not found" ) );
 
         List<LoanInstallment> installments = installmentRepository.findByLoanId( loanId );
         installments.sort( Comparator.comparing( LoanInstallment::getDueDate ) );

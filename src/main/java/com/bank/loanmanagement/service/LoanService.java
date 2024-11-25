@@ -6,6 +6,7 @@ import com.bank.loanmanagement.dto.LoanResponseDto;
 import com.bank.loanmanagement.dto.PaymentResponseDto;
 import com.bank.loanmanagement.exception.InsufficientCreditLimitException;
 import com.bank.loanmanagement.exception.ResourceNotFoundException;
+import com.bank.loanmanagement.exception.InvalidParameterException;
 import com.bank.loanmanagement.model.Customer;
 import com.bank.loanmanagement.model.Loan;
 import com.bank.loanmanagement.model.LoanInstallment;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -61,10 +61,11 @@ public class LoanService {
         return loanDtos;
     }
 
+
     public LoanResponseDto createLoan( LoanRequestDto request ) {
         // Verify customer
         Customer customer = customerRepository.findById( request.getCustomerId() )
-                .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "Customer not found" ) );
 
         // Number of installments and interest rate controls
         validateLoanRequest( request );
@@ -76,7 +77,7 @@ public class LoanService {
         // Compare with customer's credit limit
         BigDecimal newUsedCreditLimit = customer.getUsedCreditLimit().add( totalLoanAmount );
         if ( newUsedCreditLimit.compareTo( customer.getCreditLimit() ) > 0 ) {
-            throw new InsufficientCreditLimitException( "Yetersiz kredi limiti" );
+            throw new InsufficientCreditLimitException( "Insufficient credit limit" );
         }
 
         // Creation of loans and installments
@@ -115,12 +116,12 @@ public class LoanService {
     private void validateLoanRequest( LoanRequestDto request ) {
         List<Integer> validInstallments = Arrays.asList( 6, 9, 12, 24 );
         if ( !validInstallments.contains( request.getNumberOfInstallment() ) ) {
-            throw new InvalidParameterException( "Geçersiz taksit sayısı" );
+            throw new InvalidParameterException( "Invalid number of installments" );
         }
 
         if ( request.getInterestRate().compareTo( new BigDecimal( "0.1" ) ) < 0 ||
                 request.getInterestRate().compareTo( new BigDecimal( "0.5" ) ) > 0 ) {
-            throw new InvalidParameterException( "Faiz oranı 0.1 ile 0.5 arasında olmalıdır" );
+            throw new InvalidParameterException( "The interest rate should be between 0.1 and 0.5" );
         }
     }
 
@@ -144,7 +145,7 @@ public class LoanService {
     public List<LoanResponseDto> listLoans( Long customerId ) {
         // Verify customer
         Customer customer = customerRepository.findById( customerId )
-                .orElseThrow( () -> new ResourceNotFoundException( "Müşteri bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "Customer not found" ) );
 
         // Get customer loans
         List<Loan> loans = loanRepository.findByCustomerId( customerId );
@@ -166,7 +167,7 @@ public class LoanService {
     public List<InstallmentDto> listInstallments( Long loanId ) {
         // Check if the loan exists
         Loan loan = loanRepository.findById( loanId )
-                .orElseThrow( () -> new ResourceNotFoundException( "Kredi bulunamadı" ) );
+                .orElseThrow( () -> new ResourceNotFoundException( "Loan not found" ) );
 
         // Get installments for the loan
         List<LoanInstallment> installments = installmentRepository.findByLoanId( loanId );

@@ -28,7 +28,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername( String username ) throws UsernameNotFoundException {
         Customer customer = customerRepository.findByUsername( username )
-                .orElseThrow( () -> new UsernameNotFoundException( "Kullanıcı bulunamadı" ) );
+                .orElseThrow( () -> new UsernameNotFoundException( "User not found" ) );
 
         List<GrantedAuthority> authorities = new ArrayList<>();
 
