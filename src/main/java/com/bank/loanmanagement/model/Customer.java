@@ -24,10 +24,16 @@ public class Customer {
     private String username;
     private String name;
     private String surname;
+
+    private String password;
+    
     private BigDecimal creditLimit;
     private BigDecimal usedCreditLimit = BigDecimal.ZERO;
 
+    private String role;
+    
     // Müşterinin kredileriyle ilişkilendirilmesi
     @OneToMany( mappedBy = "customer", cascade = CascadeType.ALL )
     private List<Loan> loans;
+
 }

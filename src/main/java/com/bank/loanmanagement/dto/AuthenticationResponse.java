@@ -1,0 +1,17 @@
+package com.bank.loanmanagement.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author Sayat Ertüfenk
+ * @since 25/11/2024
+ */
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthenticationResponse {
+    private String jwt;
+}
