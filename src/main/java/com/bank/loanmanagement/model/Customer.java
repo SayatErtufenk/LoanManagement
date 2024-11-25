@@ -32,7 +32,6 @@ public class Customer {
 
     private String role;
     
-    // Müşterinin kredileriyle ilişkilendirilmesi
     @OneToMany( mappedBy = "customer", cascade = CascadeType.ALL )
     private List<Loan> loans;
 
